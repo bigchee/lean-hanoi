@@ -3,13 +3,13 @@ import LeanHanoi.Util.Relation
 open List
 open UtilRelation
 
--- TODO : 外から使うやつをtheorem, 内部用をlemmaにする
+-- 外から使うものはtheorem, 内部用はlemmaになっている
 
 namespace UtilList
 
 section Append
 
-lemma lt_append_left {α : Type} (l1 l2 : List α) (m : Nat) (h : m < l1.length)
+theorem lt_append_left {α : Type} (l1 l2 : List α) (m : Nat) (h : m < l1.length)
    : m < (l1 ++ l2).length := by
   rw [List.length_append]
   have : l1.length ≤ l1.length + l2.length := by
@@ -20,7 +20,7 @@ lemma lt_append_left {α : Type} (l1 l2 : List α) (m : Nat) (h : m < l1.length)
   · exact this
 
 -- これはList.getElem_append_left' で良かった
-lemma get_append_left {α : Type} (l1 l2 : List α) (m : Nat) (h : m < l1.length) :
+theorem get_append_left {α : Type} (l1 l2 : List α) (m : Nat) (h : m < l1.length) :
     (l1 ++ l2).get ⟨m, lt_append_left l1 l2 m h⟩ = l1.get ⟨m, h⟩ := by
   induction l1 generalizing m with
   | nil =>
@@ -40,7 +40,7 @@ end Append
 
 section Range
 
-theorem add_one_range' {n m : ℕ} : range' n m ++ [n + m] = range' n (m + 1) := by
+lemma add_one_range' {n m : ℕ} : range' n m ++ [n + m] = range' n (m + 1) := by
   induction m generalizing n
   case zero => simp
   case succ m' ih =>
@@ -56,7 +56,7 @@ theorem add_one_range' {n m : ℕ} : range' n m ++ [n + m] = range' n (m + 1) :=
     rw [h] at this
     exact congr_arg (fun l => n :: l) this
 
-theorem append_range_loop {n : ℕ} {l_1 l_2 : List ℕ}
+lemma append_range_loop {n : ℕ} {l_1 l_2 : List ℕ}
   : (range.loop n l_1) ++ l_2 = range.loop n (l_1 ++ l_2) := by
   induction n generalizing l_1
   case zero => dsimp [range.loop]
@@ -67,7 +67,7 @@ theorem append_range_loop {n : ℕ} {l_1 l_2 : List ℕ}
     rw [← List.cons_append]
     exact this
 
-theorem add_range_range_add {n m : ℕ} : range (n + m) = (range n ++ range' n m) := by
+lemma add_range_range_add {n m : ℕ} : range (n + m) = (range n ++ range' n m) := by
     dsimp [range, range']
     induction m
     case zero => simp
@@ -82,12 +82,12 @@ theorem add_range_range_add {n m : ℕ} : range (n + m) = (range n ++ range' n m
       apply congr_arg (fun l => l ++ [n + m'])
       exact ih
 
-lemma add_range_1 {n: ℕ} : range (n + 1) = (range n ++ [n]) := by
+theorem add_range_1 {n: ℕ} : range (n + 1) = (range n ++ [n]) := by
   have : range (n + 1) = (range n ++ range' n 1) := add_range_range_add
   rw [this]
   dsimp [range']
 
-lemma range_n_le_n (n : ℕ) : (∀ y ∈ range n, y ≤ n) := by
+theorem range_n_le_n (n : ℕ) : (∀ y ∈ range n, y ≤ n) := by
   dsimp [range]
   intro y h_y_in
   induction n
@@ -142,7 +142,7 @@ theorem append_perm_swap12 {a b c : List ℕ}: (a ++ (b ++ c)).Perm (b ++ (a ++ 
   rw [← List.append_assoc]
   exact List.Perm.append_right c List.perm_append_comm
 
-lemma r_perm_list {α : Type u}
+theorem r_perm_list {α : Type u}
   {R : α → α → Prop} (l_1 l_2 : List α) (h_perm : l_1.Perm l_2) (x : α) (h_rl1 : ∀y ∈ l_1, R y x)
   : ∀y ∈ l_2, R y x := by
   intros y h_y_in_l2
@@ -165,7 +165,7 @@ lemma range'_sorted (n m : ℕ) : Sorted (· ≤ ·) (List.range' n m) := by
       exact Nat.le_trans (Nat.le_succ n) (this b h_b_in)
     · exact ih (n+1)
 
-lemma add_greater_sorted (n m : ℕ) (l : List ℕ) (hl1 : Pairwise (· ≤ ·) l) (hl2 : ∀ y ∈ l, y ≤ n)
+theorem add_greater_sorted (n m : ℕ) (l : List ℕ) (hl1 : Pairwise (· ≤ ·) l) (hl2 : ∀ y ∈ l, y ≤ n)
   : Pairwise (· ≤ ·) (l ++ (range' n m)) := by
   let le_n_addList : ∀ y ∈ range' n m, n ≤ y := range'_le_n n m
   have : Pairwise (· ≤ ·) (range' n m) := range'_sorted n m
@@ -173,24 +173,6 @@ lemma add_greater_sorted (n m : ℕ) (l : List ℕ) (hl1 : Pairwise (· ≤ ·) 
     := pairwise_append_transr hl1 this ⟨n,hl2, le_n_addList⟩
   exact this
 
-lemma range_sorted (n : ℕ) : Sorted (· ≤ ·) (List.range n) := by
-  induction n
-  case zero => simp
-  case succ n' ih =>
-    dsimp [range, range.loop]
-    dsimp [range, range.loop] at ih
-    have : (((range.loop n' []) ++ [n']) = (range.loop n' ([] ++ [n']))) := append_range_loop
-    simp at this
-    rw [← this]
-    let h_2 : Sorted (· ≤ ·) [n'] := by simp
-    let h_3 : (∀ y ∈ (range.loop n' []), y ≤ n') ∧ (∀ z ∈ [n'], n' ≤ z) := by
-      constructor
-      · intro y hy ; exact range_n_le_n n' y hy
-      · intro z hz ; simp at hz ; rw [hz]
-    apply pairwise_append_transr
-    · exact ih
-    · exact h_2
-    · exact ⟨n',h_3⟩
 end Sorted
 
 section Derive

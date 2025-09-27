@@ -28,7 +28,7 @@ structure Move where
   valid : s ≠ t
 
 def proj_ith_tower {n : ℕ} (q : State n) (i : Pos) : List ℕ  :=
-  match i with
+  match (generalizing := true) i with
     | .A => q.a
     | .B => q.b
     | .C => q.c
@@ -42,10 +42,10 @@ def rest_tower (fromIdx : Pos) (toIdx : Pos) (_ : fromIdx ≠ toIdx)
 end Data
 
 
--- 以下はrule moduleとかにすべきか?
--- 遷移の正しさ
 namespace Rule
 open Data
+
+-- 遷移の正しさ
 def valid_move {n : ℕ} (qFrom : State n) (qTo : State n) : Prop :=
   ∃ m : Move, ∃ h1 : proj_ith_tower qFrom m.s ≠ [], ∃ h2 : proj_ith_tower qTo m.t ≠ [],
       ((proj_ith_tower qFrom m.s).head h1 = (proj_ith_tower qTo m.t).head h2)
@@ -78,9 +78,6 @@ def is_gathered_ith {n : ℕ} (q : State n) (i : Pos): Prop :=
   let tower_i := proj_ith_tower q i
   tower_i = range n
 
--- 本当はさらに有効な遷移があるかを確認する必要がある
--- 修正によって必ず長さ1以上になった
--- hは引数じゃなくて返り値側に行くべきでは?
 def is_solution {n : ℕ} (i j : Pos) (ans : SList n) : Prop := by
   by_cases h : ans.t = []
   case pos => exact False

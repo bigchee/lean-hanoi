@@ -2,7 +2,7 @@ import Mathlib.Tactic
 open List
 
 namespace UtilRelation
-lemma pairwise_append_transr {α : Type u} {R : α → α → Prop} [IsTrans α R] {l_1 l_2 : List α}
+theorem pairwise_append_transr {α : Type u} {R : α → α → Prop} [IsTrans α R] {l_1 l_2 : List α}
   (h_1 : Pairwise R l_1) (h_2 : Pairwise R l_2)
   (h_3 : ∃ x : α , (∀ y ∈ l_1, R y x) ∧ (∀ z ∈ l_2, R x z)) : Pairwise R (l_1 ++ l_2) := by
   induction l_1
@@ -23,7 +23,7 @@ lemma pairwise_append_transr {α : Type u} {R : α → α → Prop} [IsTrans α 
         exact IsTrans.trans h x a' p_rhx this
     · exact ih h_12 ⟨x,p_rax, p_rxz⟩
 
-lemma lt_remove_predsucc_ne_zero {m n : ℕ} (h : m < n.pred) : m + 1 < n := by
+theorem lt_remove_predsucc_ne_zero {m n : ℕ} (h : m < n.pred) : m + 1 < n := by
   cases n
   case zero => contradiction
   case succ n' =>
@@ -31,12 +31,12 @@ lemma lt_remove_predsucc_ne_zero {m n : ℕ} (h : m < n.pred) : m + 1 < n := by
     apply Nat.add_lt_add_iff_right.mpr
     exact h
 
-lemma sub_one_lt_of_lt {m n : ℕ} (h : m+1 < n) : m < n := by
+theorem sub_one_lt_of_lt {m n : ℕ} (h : m+1 < n) : m < n := by
   have : (m+1) - 1 < n := Nat.sub_lt_of_lt h
   simp [Nat.add_sub_assoc (Nat.le_refl 1)] at this
   exact this
 
-lemma predsucc_id (s : Nat) (hs : s ≥ 1): (s - 1) + 1 = s := by
+theorem predsucc_id (s : Nat) (hs : s ≥ 1): (s - 1) + 1 = s := by
   rw [Nat.add_comm,← Nat.add_sub_assoc,Nat.add_comm,Nat.add_sub_assoc]
   · rw [Nat.sub_self 1]
     simp

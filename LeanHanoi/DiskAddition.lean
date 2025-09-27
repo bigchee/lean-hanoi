@@ -92,32 +92,29 @@ theorem proj_notappend_ith_tower {n m : ℕ} (j i : Pos) (q : State n) (h : j �
 
 end ProjProperty
 
--- StateとSListで区別する
 section PreserveProperty
 
-lemma adab2SList_preserve_length {n : ℕ} (i : Pos) (m : ℕ) (q : SList n)
+theorem adab2SList_preserve_length {n : ℕ} (i : Pos) (m : ℕ) (q : SList n)
   : (adab2SList i m q).t.length = q.t.length := by
   dsimp [adab2SList]
   have : (map (add_disk_at_bottom i m) q.t).length = q.t.length
     := List.length_map (add_disk_at_bottom i m)
   exact this
 
-lemma adab2SList_preserve_ne_nil {n : ℕ} (i : Pos) (m : ℕ) (q : SList n) (h : q.t ≠ [])
+theorem adab2SList_preserve_ne_nil {n : ℕ} (i : Pos) (m : ℕ) (q : SList n) (h : q.t ≠ [])
   : (adab2SList i m q).t ≠ [] := by
   apply List.ne_nil_iff_length_pos.mpr
   let h := List.ne_nil_iff_length_pos.mp h
   rw [adab2SList_preserve_length i m q]
   exact h
 
-lemma adab_preseve_projEq {n m : ℕ} (q1 q2 : State n) (pos1 pos2 i : Pos)
+theorem adab_preseve_projEq {n m : ℕ} (q1 q2 : State n) (pos1 pos2 i : Pos)
   (h1 : proj_ith_tower q1 pos1 ≠ []) (h2 : proj_ith_tower q2 pos2 ≠ [])
   (h3 : (proj_ith_tower q1 pos1).head h1 = (proj_ith_tower q2 pos2).head h2)
   -- (h4 : (proj_ith_tower (add_disk_at_bottom i m q1) pos1) ≠ [])
   -- (h5 : (proj_ith_tower (add_disk_at_bottom i m q2) pos2) ≠ [])
   : (proj_ith_tower (add_disk_at_bottom i m q1) pos1).head?
     = (proj_ith_tower (add_disk_at_bottom i m q2) pos2).head? := by
-  -- これhead?でも使えるのか? headの方は証明の型が合わないとかいわれて... よさそう?でも.
-  -- -- repeat
     cases i
     repeat'
       cases pos1
@@ -135,12 +132,12 @@ lemma adab_preseve_projEq {n m : ℕ} (q1 q2 : State n) (pos1 pos2 i : Pos)
           simp [this]
           exact h3
 
-lemma adab2SList_preserve_lt {m n k : ℕ} {l : SList n} {j : Pos} (h : m < l.t.length)
+theorem adab2SList_preserve_lt {m n k : ℕ} {l : SList n} {j : Pos} (h : m < l.t.length)
   : m < (adab2SList j k l).t.length := by
   rw [adab2SList_preserve_length j k l]
   exact h
 
-lemma adab_preserve_proj_ne_nil {n m : ℕ} (pos1 pos2 : Pos) (q : State n)
+theorem adab_preserve_proj_ne_nil {n m : ℕ} (pos1 pos2 : Pos) (q : State n)
   (h1 : proj_ith_tower q pos2 ≠ [])
   : proj_ith_tower (add_disk_at_bottom pos1 m q) pos2 ≠ [] := by
   by_cases hpos : pos1 = pos2
@@ -168,7 +165,7 @@ lemma adab2SList_preserve_proj_ne_nil {m n k : ℕ} {l : SList n} {i j : Pos} (h
   rw [this]
   exact adab_preserve_proj_ne_nil j i (l.t.get ⟨m, h1⟩) h2
 
-lemma adab2SList_preserve_move_valid {m n k : ℕ} {l : SList n} {j : Pos} (h1 : m+1 < l.t.length)
+theorem adab2SList_preserve_move_valid {m n k : ℕ} {l : SList n} {j : Pos} (h1 : m+1 < l.t.length)
   (h2 : valid_move (l.t.get ⟨m,sub_one_lt_of_lt h1⟩)  (l.t.get ⟨m+1,h1⟩) )
   : valid_move ((adab2SList j k l).t.get ⟨m,sub_one_lt_of_lt (adab2SList_preserve_lt h1)⟩)
     ((adab2SList j k l).t.get ⟨m+1,adab2SList_preserve_lt h1⟩) := by
